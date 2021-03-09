@@ -309,71 +309,16 @@ def main():
         task_range_step = int(current_taks[3])
         print("Task on", task_structure, "in data range from", task_start_range,
               "to", task_stop_range, "with step", task_range_step, ".")
-        if task_structure == 'array':
-            for i in range(task_start_range, task_stop_range, task_range_step):
-                array_operations(i)
-        print("Done.")
+        if task_stop_range > len(data_array):
+            print("Not enought loaded data to execute task.")
+        else:
+            if task_structure == 'array':
+                for i in range(task_start_range, task_stop_range, task_range_step):
+                    array_operations(i)
+            print("Done.")
     result_config_file_name = config['results']['file_name']
     save_results(result_config_file_name)
     print("Results saved to file", result_config_file_name, ".")
-
-    # while True:
-    #     os.system('cls')
-    #     print(menu_message)
-    #     key = ord(getch())
-    #     if key == 27:  # ESC
-    #         quit()
-    #     elif key == 49:  # 1
-    #         amount = int(input("Ilość liczb do wygenerowania: "))
-    #         if amount < 1:
-    #             print("Wybrana wartość jest nieprawidłowa")
-    #             print("Naciśnij ENTER, aby kontytnuować...")
-    #             input()
-    #         else:
-    #             generate_data(amount)
-    #             print("Wygenerowano ", amount, "liczb i zapisano w pliku CSV")
-    #             print("Naciśnij ENTER, aby kontytnuować...")
-    #             input()
-    #     elif key == 50:  # 2
-    #         amount = input("Ilość liczb do załadowania: ")
-    #         if load_data(int(amount)):
-    #             print("Wczytano", amount, "liczb z pliku")
-    #         else:
-    #             print("Nie można wczytać podanej ilości liczb")
-    #         print("Naciśnij ENTER, aby kontytnuować...")
-    #         input()
-    #     elif key == 51:  # 3
-    #         save_results()
-    #         print("Zapisano wszystkie wyniki wygenerowane w tej sesji działania programu")
-    #         print("Naciśnij ENTER, aby kontytnuować...")
-    #         input()
-    #     elif key == 52:  # 4
-    #         input_range = read_range()
-    #         if input_range[0] != -1:
-    #             for i in range(input_range[0], input_range[1]+1):
-    #                 array_operations(i)
-    #             print("Testy ", input_range[1]-input_range[0]+1,
-    #                   " elementów przeprowadzono prawidłowo")
-    #             print("Naciśnij ENTER, aby kontytnuować...")
-    #             input()
-    #     elif key == 53:  # 5
-    #         input_range = read_range()
-    #         if input_range[0] != -1:
-    #             for i in range(input_range[0], input_range[1]+1):
-    #                 linked_list_operations(i)
-    #             print("Testy ", input_range[1]-input_range[0]+1,
-    #                   " elementów przeprowadzono prawidłowo")
-    #             print("Naciśnij ENTER, aby kontytnuować...")
-    #             input()
-    #     elif key == 54:  # 6
-    #         input_range = read_range()
-    #         if input_range[0] != -1:
-    #             for i in range(input_range[0], input_range[1]+1):
-    #                 stack_operations(i)
-    #             print("Testy ", input_range[1]-input_range[0]+1,
-    #                   " elementów przeprowadzono prawidłowo")
-    #             print("Naciśnij ENTER, aby kontytnuować...")
-    #             input()
 
 
 main()
