@@ -219,9 +219,10 @@ def linked_list_operations(size_of_linked_list):
 def array_operations(size_of_array):
     # CREATE OPERATION
     t_start = perf_counter_ns()
-    array = arr.array("i")
+    array = [None]*size_of_array
+    print(array)
     for i in range(size_of_array):
-        array.append(data_array[i])
+        array[i] = data_array[i]
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
     # GET (READ) OPERATION
