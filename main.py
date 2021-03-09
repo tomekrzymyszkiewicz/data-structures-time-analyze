@@ -1,31 +1,14 @@
 from time import perf_counter_ns
 import csv
 import random
-import array as arr
 import os
 import configparser
 from msvcrt import getch
 data_array = []
 result_array = []
-menu_message = """==========================================
-### PRORGAM DO ANALIZY STRUKTUR DANYCH ###
-###    AUTOR: TOMASZ RZYMYSZKIEWICZ    ###
-==========================================
-1. GENERUJ DANE DO PLIKU CSV
-2. WCZYTAJ DANE Z PLIKU CSV
-3. ZAPISZ WYNIKI DO PLIKU CSV
-4. PRZEPROWADŹ TEST OPERACJI NA TABLICY
-5. PRZEPROWADŹ TEST OPERACJI NA LIŚCIE
-6. PRZEPROWADŹ TEST OPERACJI NA STOSIE
-7. PRZEPROWADŹ TEST OPERACJI NA KOLEJCE
-ESC. WYJDŹ Z PROGRAMU"""
 
 
 class Result:
-    data_structure = "null"
-    operation = "null"
-    size_of_structure = 0
-    time_of_operation = 0
 
     def __init__(self, data_structure, operation, size_of_structure, time_of_operation):
         self.data_structure = data_structure
@@ -37,12 +20,12 @@ class Result:
 def save_results(result_config_file_name):
     with open(result_config_file_name, newline='', mode='w') as result_file:
         field_names = ['data_strucutre', 'operation',
-                       'size_of_structure', 'time_of_operation']
+                       'size_of_structure', 'time_of_operation_ns']
         result_writer = csv.DictWriter(result_file, fieldnames=field_names)
         result_writer.writeheader()
         for i in range(len(result_array)):
             result_writer.writerow({'data_strucutre': result_array[i].data_structure, 'operation': result_array[i].operation,
-                                    'size_of_structure': result_array[i].size_of_structure, 'time_of_operation': result_array[i].time_of_operation})
+                                    'size_of_structure': result_array[i].size_of_structure, 'time_of_operation_ns': result_array[i].time_of_operation})
 
 
 def load_data(file_name, amount):
@@ -86,7 +69,7 @@ class Node(object):
         self.data = data
 
 
-class LinkedList(object):
+class List(object):
     def __init__(self, head=None):
         self.head = head
 
@@ -152,6 +135,16 @@ class Stack:
         return len(self.elements) == 0
 
 
+def queue_operations(size_of_queue):
+    # CREATE OPERATION
+    t_start = perf_counter_ns()
+    queue = []
+    for i in range(size_of_queue):
+        queue.append(data_array[i])
+    t_stop = perf_counter_ns()
+    t_create = t_stop-t_start
+
+
 def stack_operations(size_of_stack):
     # CREATE OPERATION
     t_start = perf_counter_ns()
@@ -182,42 +175,42 @@ def stack_operations(size_of_stack):
     result_array.append(Result("stack", "peek", size_of_stack, t_peek))
 
 
-def linked_list_operations(size_of_linked_list):
+def list_operations(size_of_list):
     # CREATE OPERATION
     t_start = perf_counter_ns()
-    linked_list = LinkedList()
-    for i in range(size_of_linked_list):
-        linked_list.add(data_array[i])
+    list = List()
+    for i in range(size_of_list):
+        list.add(data_array[i])
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
     # ADD OPERATION
     random_value = random.randint(-1000000, 1000000)
     t_start = perf_counter_ns()
-    linked_list.add(random_value)
+    list.add(random_value)
     t_stop = perf_counter_ns()
     t_add = t_stop-t_start
     # DELETE OPERATION (with find)
-    random_index = random.randint(0, size_of_linked_list-1)
+    random_index = random.randint(0, size_of_list-1)
     random_value = data_array[random_index]
     t_start = perf_counter_ns()
-    linked_list.remove(random_value)
+    list.remove(random_value)
     t_stop = perf_counter_ns()
     t_delete = t_stop-t_start
     # SEARCH OPERATION
-    random_index = random.randint(0, size_of_linked_list-1)
+    random_index = random.randint(0, size_of_list-1)
     random_value = data_array[random_index]
     t_start = perf_counter_ns()
-    linked_list.find(random_value)
+    list.find(random_value)
     t_stop = perf_counter_ns()
     t_search = t_stop-t_start
-    result_array.append(Result("linked_list", "create",
-                               size_of_linked_list, t_create))
-    result_array.append(Result("linked_list", "add",
-                               size_of_linked_list, t_add))
-    result_array.append(Result("linked_list", "delete",
-                               size_of_linked_list, t_delete))
-    result_array.append(Result("linked_list", "search",
-                               size_of_linked_list, t_search))
+    result_array.append(Result("list", "create",
+                               size_of_list, t_create))
+    result_array.append(Result("list", "add",
+                               size_of_list, t_add))
+    result_array.append(Result("list", "delete",
+                               size_of_list, t_delete))
+    result_array.append(Result("list", "search",
+                               size_of_list, t_search))
 
 
 def array_operations(size_of_array):
@@ -272,35 +265,22 @@ def array_operations(size_of_array):
     result_array.append(Result("array", "search", size_of_array, t_search))
 
 
-def read_range():
-    s = ""
-    print(s.join((
-        "Podaj zakres danych, na których chcesz przeprowadzić test operacji [1,", str(len(data_array)), "]")))
-    range_beginning = int(input("Podaj początek zakresu (min. 1): "))
-    range_end = int(
-        input(s.join(("Podaj koniec zakresu (max. ", str(len(data_array)), "): "))))
-    if range_beginning < 1 | len(data_array) < range_end:
-        print("Wybrany zakres jest nieprawidłowy")
-        print("Naciśnij ENTER, aby kontytnuować...")
-        input()
-        return [-1]
-    else:
-        return [range_beginning, range_end]
-
-
 def main():
     config = configparser.ConfigParser()
     config.read('config.ini')
     data_config_file_name = config['data']['file_name']
     data_config_amount = int(config['data']['amount'])
 
-    if load_data(data_config_file_name, data_config_amount) == True:
-        print("Data loaded from", data_config_file_name, "successfully.")
+    if load_data(data_config_file_name, data_config_amount):
+        print("Data loaded from", data_config_file_name, "successfully")
     else:
+        print("Data loading error. A new", data_config_file_name,
+              "file with", data_config_amount, "elements will be generated")
         generate_data(data_config_file_name, data_config_amount)
         load_data(data_config_file_name, data_config_amount)
-        print("Data loading error. A new", data_config_file_name,
-              "file with", data_config_amount, "elements has been generated.")
+        print("Done")
+
+    print()
     for i in config['tasks']:
         current_taks = config['tasks'][i].split(' ')
         task_structure = current_taks[0]
@@ -308,17 +288,47 @@ def main():
         task_stop_range = int(current_taks[2])
         task_range_step = int(current_taks[3])
         print("Task on", task_structure, "in data range from", task_start_range,
-              "to", task_stop_range, "with step", task_range_step, ".")
+              "to", task_stop_range, "with step", task_range_step)
         if task_stop_range > len(data_array):
-            print("Not enought loaded data to execute task.")
+            print("Not enought loaded data to execute task")
         else:
             if task_structure == 'array':
-                for i in range(task_start_range, task_stop_range, task_range_step):
-                    array_operations(i)
-            print("Done.")
+                try:
+                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                        array_operations(current_size_of_structure)
+                    print("Done")
+                except:
+                    print("Error")
+            elif task_structure == 'list':
+                try:
+                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                        list_operations(current_size_of_structure)
+                    print("Done")
+                except:
+                    print("Error")
+            elif task_structure == 'stack':
+                try:
+                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                        stack_operations(current_size_of_structure)
+                    print("Done")
+                except:
+                    print("Error")
+            elif task_structure == 'queue':
+                try:
+                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                        queue_operations(current_size_of_structure)
+                    print("Done")
+                except:
+                    print("Error")
+            else:
+                print("Task not recognized")
+
+    print()
     result_config_file_name = config['results']['file_name']
     save_results(result_config_file_name)
-    print("Results saved to file", result_config_file_name, ".")
+    print("Results saved to", result_config_file_name)
+    print("Press any key to exit...")
+    getch()
 
 
 main()
