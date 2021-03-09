@@ -135,14 +135,78 @@ class Stack:
         return len(self.elements) == 0
 
 
+class Queue:
+    def __init__(self, max_size, size=0, front=0, rear=0):
+        self.queue = [0]*max_size
+        self.max_size = max_size
+        self.size = size
+        self.front = front
+        self.rear = rear
+
+    def enqueue(self, data):
+        if not self.isFull():
+            self.queue[self.rear] = data
+            self.rear = int((self.rear + 1) % self.max_size)
+            self.size += 1
+
+    def dequeue(self):
+        if not self.isEmpty():
+            dequeued_element = self.queue[self.front]
+            self.front = int((self.front + 1) % self.max_size)
+            self.size -= 1
+            return dequeued_element
+
+    def isEmpty(self):
+        return self.size == 0
+
+    def isFull(self):
+        return self.size == self.max_size
+
+    def peek(self):
+        return self.queue[self.front]
+
+
 def queue_operations(size_of_queue):
     # CREATE OPERATION
     t_start = perf_counter_ns()
-    queue = []
+    queue = Queue(size_of_queue)
     for i in range(size_of_queue):
-        queue.append(data_array[i])
+        queue.enqueue(data_array[i])
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
+    # PUT OPERATION, in queue structure this operation don't have sense
+    # SEARCH OPERATION
+    random_index = random.randint(0, size_of_queue-1)
+    searched_value = data_array[random_index]
+    t_start = perf_counter_ns()
+    temp_queue = Queue(size_of_queue)
+    temp_queue_len = 0
+    for i in range(size_of_queue):
+        if queue.peek() == searched_value:
+            break
+        else:
+            temp_queue.enqueue(queue.dequeue())
+            temp_queue_len += 1
+    for i in range(temp_queue_len):
+        queue.enqueue(temp_queue.dequeue())
+    t_stop = perf_counter_ns()
+    t_search = t_stop-t_start
+    # DELETE OPERATION
+    t_start = perf_counter_ns()
+    queue.dequeue()
+    t_stop = perf_counter_ns()
+    t_dequeue = t_stop-t_start
+    # ADD OPERATION
+    random_value = random.randint(-1000000, 1000000)
+    t_start = perf_counter_ns()
+    queue.enqueue(random_value)
+    t_stop = perf_counter_ns()
+    t_enqueue = t_stop-t_start
+    # RESULT SECTION
+    result_array.append(Result("queue", "create", size_of_queue, t_create))
+    result_array.append(Result("queue", "enqueue", size_of_queue, t_enqueue))
+    result_array.append(Result("queue", "dequeue", size_of_queue, t_dequeue))
+    result_array.append(Result("queue", "search", size_of_queue, t_search))
 
 
 def stack_operations(size_of_stack):
@@ -170,6 +234,16 @@ def stack_operations(size_of_stack):
     t_start = perf_counter_ns()
     temp_stack = Stack()
     temp_stack_len = 0
+    for i in range(size_of_stack):
+        if stack.peek() == searched_value:
+            break
+        else:
+            temp_stack.push(stack.pop())
+            temp_stack_len += 1
+    for i in range(temp_stack_len):
+        stack.push(temp_stack.pop())
+    t_stop = perf_counter_ns()
+    t_search = t_stop-t_start
     # PUT OPERATION (index of put is depth of stack when data should be putted)
     random_index = random.randint(0, size_of_stack-1)
     random_value = random.randint(-1000000, 1000000)
@@ -182,16 +256,8 @@ def stack_operations(size_of_stack):
         stack.push(temp_stack.pop())
     t_stop = perf_counter_ns()
     t_put = t_stop-t_start
-    for i in range(size_of_stack):
-        if stack.peek() == searched_value:
-            break
-        else:
-            temp_stack.push(stack.pop())
-            temp_stack_len += 1
-    for i in range(temp_stack_len):
-        stack.push(temp_stack.pop())
-    t_stop = perf_counter_ns()
-    t_search = t_stop-t_start
+
+    # RESULT SECTION
     result_array.append(Result("stack", "create", size_of_stack, t_create))
     result_array.append(Result("stack", "put", size_of_stack, t_put))
     result_array.append(Result("stack", "push", size_of_stack, t_push))
@@ -207,6 +273,13 @@ def list_operations(size_of_list):
         list.add(data_array[i])
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
+    # SEARCH OPERATION
+    random_index = random.randint(0, size_of_list-1)
+    random_value = data_array[random_index]
+    t_start = perf_counter_ns()
+    list.find(random_value)
+    t_stop = perf_counter_ns()
+    t_search = t_stop-t_start
     # ADD OPERATION
     random_value = random.randint(-1000000, 1000000)
     t_start = perf_counter_ns()
@@ -220,13 +293,7 @@ def list_operations(size_of_list):
     list.remove(random_value)
     t_stop = perf_counter_ns()
     t_delete = t_stop-t_start
-    # SEARCH OPERATION
-    random_index = random.randint(0, size_of_list-1)
-    random_value = data_array[random_index]
-    t_start = perf_counter_ns()
-    list.find(random_value)
-    t_stop = perf_counter_ns()
-    t_search = t_stop-t_start
+    # RESULT SECTION
     result_array.append(Result("list", "create",
                                size_of_list, t_create))
     result_array.append(Result("list", "add",
@@ -251,6 +318,15 @@ def array_operations(size_of_array):
     array[random_index] = 0
     t_stop = perf_counter_ns()
     t_put = t_stop-t_start
+    # SEARCH OPERATION
+    random_index = random.randint(0, size_of_array-1)
+    searched_value = array[random_index]
+    t_start = perf_counter_ns()
+    for i in range(size_of_array):
+        if(searched_value == array[i]):
+            t_stop = perf_counter_ns()
+            break
+    t_search = t_stop-t_start
     # ADD OPERATION
     random_value = random.randint(-1000000, 1000000)
     t_start = perf_counter_ns()
@@ -261,15 +337,6 @@ def array_operations(size_of_array):
     array = new_array
     t_stop = perf_counter_ns()
     t_add = t_stop-t_start
-    # SEARCH OPERATION
-    random_index = random.randint(0, size_of_array-1)
-    searched_value = array[random_index]
-    t_start = perf_counter_ns()
-    for i in range(size_of_array):
-        if(searched_value == array[i]):
-            t_stop = perf_counter_ns()
-            break
-    t_search = t_stop-t_start
     # DELETE OPERATION
     random_index = random.randint(0, size_of_array-1)
     t_start = perf_counter_ns()
