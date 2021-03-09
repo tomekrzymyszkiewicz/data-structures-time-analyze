@@ -18,7 +18,7 @@ Set properties in configuration file:
 ```
 Task syntax
 
-task number = structure, range start value, range stop value, step value, number of repeat
+task number = structure, range start value, range stop value, step value, (optionally) number of repeat
 
 Example
 
