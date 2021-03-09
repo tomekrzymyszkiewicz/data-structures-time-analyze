@@ -219,24 +219,27 @@ def linked_list_operations(size_of_linked_list):
 def array_operations(size_of_array):
     # CREATE OPERATION
     t_start = perf_counter_ns()
-    array = [None]*size_of_array
-    print(array)
+    array = [0]*size_of_array
     for i in range(size_of_array):
         array[i] = data_array[i]
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
-    # GET (READ) OPERATION
-    random_index = random.randint(0, size_of_array-1)
-    t_start = perf_counter_ns()
-    x = array[random_index]
-    t_stop = perf_counter_ns()
-    t_get = t_stop-t_start
-    # PUT (WRITE) OPERATION
+    # PUT OPERATION
     random_index = random.randint(0, size_of_array-1)
     t_start = perf_counter_ns()
     array[random_index] = 0
     t_stop = perf_counter_ns()
     t_put = t_stop-t_start
+    # ADD OPERATION
+    random_value = random.randint(-1000000, 1000000)
+    t_start = perf_counter_ns()
+    new_array = [0]*(size_of_array+1)
+    for i in range(size_of_array):
+        new_array[i] = array[i]
+    new_array[size_of_array] = random_value
+    array = new_array
+    t_stop = perf_counter_ns()
+    t_add = t_stop-t_start
     # SEARCH OPERATION
     random_index = random.randint(0, size_of_array-1)
     searched_value = array[random_index]
@@ -249,22 +252,20 @@ def array_operations(size_of_array):
     # DELETE OPERATION
     random_index = random.randint(0, size_of_array-1)
     t_start = perf_counter_ns()
-    array.pop(random_index)
+    new_array = [0]*(size_of_array-1)
+    for i in range(0, random_index):
+        new_array[i] = array[i]
+    for i in range(random_index+1, size_of_array-1):
+        new_array[i] = array[i+1]
+    array = new_array
     t_stop = perf_counter_ns()
     t_delete = t_stop-t_start
-    # ADD OPERATION
-    random_value = random.randint(-1000000, 1000000)
-    t_start = perf_counter_ns()
-    array.append(random_value)
-    t_stop = perf_counter_ns()
-    t_add = t_stop-t_start
     # RESULT SECTION
-    result_array.append(Result("array", "put", size_of_array, t_put))
-    result_array.append(Result("array", "get", size_of_array, t_get))
     result_array.append(Result("array", "create", size_of_array, t_create))
-    result_array.append(Result("array", "search", size_of_array, t_search))
-    result_array.append(Result("array", "delete", size_of_array, t_delete))
+    result_array.append(Result("array", "put", size_of_array, t_put))
     result_array.append(Result("array", "add", size_of_array, t_add))
+    result_array.append(Result("array", "delete", size_of_array, t_delete))
+    result_array.append(Result("array", "search", size_of_array, t_search))
 
 
 def read_range():
