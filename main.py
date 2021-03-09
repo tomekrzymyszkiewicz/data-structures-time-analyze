@@ -290,75 +290,82 @@ def array_operations(size_of_array):
 
 
 def main():
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    data_config_file_name = config['data']['file_name']
-    data_config_amount = int(config['data']['amount'])
+    try:
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        data_config_file_name = config['data']['file_name']
+        data_config_amount = int(config['data']['amount'])
 
-    if load_data(data_config_file_name, data_config_amount):
-        print("Data loaded from", data_config_file_name, "successfully")
-    else:
-        print("Data loading error. A new", data_config_file_name,
-              "file with", data_config_amount, "elements will be generated")
-        generate_data(data_config_file_name, data_config_amount)
-        load_data(data_config_file_name, data_config_amount)
-        print("Done")
-
+        if load_data(data_config_file_name, data_config_amount):
+            print("Data loaded from", data_config_file_name, "successfully")
+        else:
+            print("Data loading error. A new", data_config_file_name,
+                  "file with", data_config_amount, "elements will be generated")
+            generate_data(data_config_file_name, data_config_amount)
+            load_data(data_config_file_name, data_config_amount)
+            print("Done")
+    except:
+        print("Loading config error")
     print()
-    for i in config['tasks']:
-        current_taks = config['tasks'][i].split(' ')
-        task_structure = current_taks[0]
-        task_start_range = int(current_taks[1])
-        task_stop_range = int(current_taks[2])
-        task_range_step = int(current_taks[3])
-        if len(current_taks) == 5:
-            task_repeat = int(current_taks[4])
-        else:
-            task_repeat = 1
-        print("Task on", task_structure, "in data range from", task_start_range,
-              "to", task_stop_range, "with step", task_range_step, "made", task_repeat, "time")
-        if task_stop_range > len(data_array):
-            print("Not enought loaded data to execute task")
-        else:
-            if task_structure == 'array':
-                try:
-                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        for repeat in range(task_repeat):
-                            array_operations(current_size_of_structure)
-                    print("Done")
-                except:
-                    print("Error")
-            elif task_structure == 'list':
-                try:
-                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        for repeat in range(task_repeat):
-                            list_operations(current_size_of_structure)
-                    print("Done")
-                except:
-                    print("Error")
-            elif task_structure == 'stack':
-                try:
-                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        for repeat in range(task_repeat):
-                            stack_operations(current_size_of_structure)
-                    print("Done")
-                except:
-                    print("Error")
-            elif task_structure == 'queue':
-                try:
-                    for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        for repeat in range(task_repeat):
-                            queue_operations(current_size_of_structure)
-                    print("Done")
-                except:
-                    print("Error")
+    try:
+        for i in config['tasks']:
+            current_taks = config['tasks'][i].split(' ')
+            task_structure = current_taks[0]
+            task_start_range = int(current_taks[1])
+            task_stop_range = int(current_taks[2])
+            task_range_step = int(current_taks[3])
+            if len(current_taks) == 5:
+                task_repeat = int(current_taks[4])
             else:
-                print("Task not recognized")
-
+                task_repeat = 1
+            print("Task on", task_structure, "in data range from", task_start_range,
+                  "to", task_stop_range, "with step", task_range_step, "made", task_repeat, "time")
+            if task_stop_range > len(data_array):
+                print("Not enought loaded data to execute task")
+            else:
+                if task_structure == 'array':
+                    try:
+                        for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                            for repeat in range(task_repeat):
+                                array_operations(current_size_of_structure)
+                        print("Done")
+                    except:
+                        print("Error")
+                elif task_structure == 'list':
+                    try:
+                        for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                            for repeat in range(task_repeat):
+                                list_operations(current_size_of_structure)
+                        print("Done")
+                    except:
+                        print("Error")
+                elif task_structure == 'stack':
+                    try:
+                        for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                            for repeat in range(task_repeat):
+                                stack_operations(current_size_of_structure)
+                        print("Done")
+                    except:
+                        print("Error")
+                elif task_structure == 'queue':
+                    try:
+                        for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
+                            for repeat in range(task_repeat):
+                                queue_operations(current_size_of_structure)
+                        print("Done")
+                    except:
+                        print("Error")
+                else:
+                    print("Task not recognized")
+    except:
+        print("Loading tasks error")
     print()
-    result_config_file_name = config['results']['file_name']
-    save_results(result_config_file_name)
-    print("Results saved to", result_config_file_name)
+    try:
+        result_config_file_name = config['results']['file_name']
+        save_results(result_config_file_name)
+        print("Results saved to", result_config_file_name)
+    except:
+        print("Saving results error")
     print("Press any key to exit...")
     getch()
 
