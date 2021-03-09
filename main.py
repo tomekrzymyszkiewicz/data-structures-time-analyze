@@ -3,6 +3,7 @@ import csv
 import random
 import array as arr
 import os
+import configparser
 from msvcrt import getch
 data_array = []
 result_array = []
@@ -33,8 +34,8 @@ class Result:
         self.time_of_operation = time_of_operation
 
 
-def save_results():
-    with open('results.csv', newline='', mode='w') as result_file:
+def save_results(result_config_file_name):
+    with open(result_config_file_name, newline='', mode='w') as result_file:
         field_names = ['data_strucutre', 'operation',
                        'size_of_structure', 'time_of_operation']
         result_writer = csv.DictWriter(result_file, fieldnames=field_names)
@@ -44,19 +45,22 @@ def save_results():
                                     'size_of_structure': result_array[i].size_of_structure, 'time_of_operation': result_array[i].time_of_operation})
 
 
-def load_data(amount):
-    with open('data.csv', mode='r') as data_file:
-        data_reader = csv.reader(data_file)
-        rows = list(data_reader)
-        if amount > len(rows):
-            return False
-        for row in range(amount):
-            data_array.append(int(rows[row][0]))
-        return True
+def load_data(file_name, amount):
+    if os.path.exists(file_name):
+        with open(file_name, mode='r') as data_file:
+            data_reader = csv.reader(data_file)
+            rows = list(data_reader)
+            if amount > len(rows):
+                return False
+            for row in range(amount):
+                data_array.append(int(rows[row][0]))
+            return True
+    else:
+        return False
 
 
-def generate_data(amount):
-    with open('data.csv', newline='', mode='w') as data_file:
+def generate_data(file_name, amount):
+    with open(file_name, newline='', mode='w') as data_file:
         data_writer = csv.writer(
             data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for i in range(amount):
@@ -285,63 +289,91 @@ def read_range():
 
 
 def main():
-    while True:
-        os.system('cls')
-        print(menu_message)
-        key = ord(getch())
-        if key == 27:  # ESC
-            quit()
-        elif key == 49:  # 1
-            amount = int(input("Ilość liczb do wygenerowania: "))
-            if amount < 1:
-                print("Wybrana wartość jest nieprawidłowa")
-                print("Naciśnij ENTER, aby kontytnuować...")
-                input()
-            else:
-                generate_data(amount)
-                print("Wygenerowano ", amount, "liczb i zapisano w pliku CSV")
-                print("Naciśnij ENTER, aby kontytnuować...")
-                input()
-        elif key == 50:  # 2
-            amount = input("Ilość liczb do załadowania: ")
-            if load_data(int(amount)):
-                print("Wczytano", amount, "liczb z pliku")
-            else:
-                print("Nie można wczytać podanej ilości liczb")
-            print("Naciśnij ENTER, aby kontytnuować...")
-            input()
-        elif key == 51:  # 3
-            save_results()
-            print("Zapisano wszystkie wyniki wygenerowane w tej sesji działania programu")
-            print("Naciśnij ENTER, aby kontytnuować...")
-            input()
-        elif key == 52:  # 4
-            input_range = read_range()
-            if input_range[0] != -1:
-                for i in range(input_range[0], input_range[1]+1):
-                    array_operations(i)
-                print("Testy ", input_range[1]-input_range[0]+1,
-                      " elementów przeprowadzono prawidłowo")
-                print("Naciśnij ENTER, aby kontytnuować...")
-                input()
-        elif key == 53:  # 5
-            input_range = read_range()
-            if input_range[0] != -1:
-                for i in range(input_range[0], input_range[1]+1):
-                    linked_list_operations(i)
-                print("Testy ", input_range[1]-input_range[0]+1,
-                      " elementów przeprowadzono prawidłowo")
-                print("Naciśnij ENTER, aby kontytnuować...")
-                input()
-        elif key == 54:  # 6
-            input_range = read_range()
-            if input_range[0] != -1:
-                for i in range(input_range[0], input_range[1]+1):
-                    stack_operations(i)
-                print("Testy ", input_range[1]-input_range[0]+1,
-                      " elementów przeprowadzono prawidłowo")
-                print("Naciśnij ENTER, aby kontytnuować...")
-                input()
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    data_config_file_name = config['data']['file_name']
+    data_config_amount = int(config['data']['amount'])
+
+    if load_data(data_config_file_name, data_config_amount) == True:
+        print("Data loaded from", data_config_file_name, "successfully.")
+    else:
+        generate_data(data_config_file_name, data_config_amount)
+        load_data(data_config_file_name, data_config_amount)
+        print("Data loading error. A new", data_config_file_name,
+              "file with", data_config_amount, "elements has been generated.")
+    for i in config['tasks']:
+        current_taks = config['tasks'][i].split(' ')
+        task_structure = current_taks[0]
+        task_start_range = int(current_taks[1])
+        task_stop_range = int(current_taks[2])
+        task_range_step = int(current_taks[3])
+        print("Task on", task_structure, "in data range from", task_start_range,
+              "to", task_stop_range, "with step", task_range_step, ".")
+        if task_structure == 'array':
+            for i in range(task_start_range, task_stop_range, task_range_step):
+                array_operations(i)
+        print("Done.")
+    result_config_file_name = config['results']['file_name']
+    save_results(result_config_file_name)
+    print("Results saved to file", result_config_file_name, ".")
+
+    # while True:
+    #     os.system('cls')
+    #     print(menu_message)
+    #     key = ord(getch())
+    #     if key == 27:  # ESC
+    #         quit()
+    #     elif key == 49:  # 1
+    #         amount = int(input("Ilość liczb do wygenerowania: "))
+    #         if amount < 1:
+    #             print("Wybrana wartość jest nieprawidłowa")
+    #             print("Naciśnij ENTER, aby kontytnuować...")
+    #             input()
+    #         else:
+    #             generate_data(amount)
+    #             print("Wygenerowano ", amount, "liczb i zapisano w pliku CSV")
+    #             print("Naciśnij ENTER, aby kontytnuować...")
+    #             input()
+    #     elif key == 50:  # 2
+    #         amount = input("Ilość liczb do załadowania: ")
+    #         if load_data(int(amount)):
+    #             print("Wczytano", amount, "liczb z pliku")
+    #         else:
+    #             print("Nie można wczytać podanej ilości liczb")
+    #         print("Naciśnij ENTER, aby kontytnuować...")
+    #         input()
+    #     elif key == 51:  # 3
+    #         save_results()
+    #         print("Zapisano wszystkie wyniki wygenerowane w tej sesji działania programu")
+    #         print("Naciśnij ENTER, aby kontytnuować...")
+    #         input()
+    #     elif key == 52:  # 4
+    #         input_range = read_range()
+    #         if input_range[0] != -1:
+    #             for i in range(input_range[0], input_range[1]+1):
+    #                 array_operations(i)
+    #             print("Testy ", input_range[1]-input_range[0]+1,
+    #                   " elementów przeprowadzono prawidłowo")
+    #             print("Naciśnij ENTER, aby kontytnuować...")
+    #             input()
+    #     elif key == 53:  # 5
+    #         input_range = read_range()
+    #         if input_range[0] != -1:
+    #             for i in range(input_range[0], input_range[1]+1):
+    #                 linked_list_operations(i)
+    #             print("Testy ", input_range[1]-input_range[0]+1,
+    #                   " elementów przeprowadzono prawidłowo")
+    #             print("Naciśnij ENTER, aby kontytnuować...")
+    #             input()
+    #     elif key == 54:  # 6
+    #         input_range = read_range()
+    #         if input_range[0] != -1:
+    #             for i in range(input_range[0], input_range[1]+1):
+    #                 stack_operations(i)
+    #             print("Testy ", input_range[1]-input_range[0]+1,
+    #                   " elementów przeprowadzono prawidłowo")
+    #             print("Naciśnij ENTER, aby kontytnuować...")
+    #             input()
 
 
 main()
