@@ -18,11 +18,11 @@ Set properties in configuration file:
 ```
 Task syntax
 
-task number = structure, range start value, range stop value, step value
+task number = structure, range start value, range stop value, step value, number of repeat
 
 Example
 
-1 = array 1 1000 2
+1 = array 1 1000 2 10
 2 = stack 5 200 5
 3 = list 1 100000 100
 

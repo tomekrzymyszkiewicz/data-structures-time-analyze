@@ -287,36 +287,44 @@ def main():
         task_start_range = int(current_taks[1])
         task_stop_range = int(current_taks[2])
         task_range_step = int(current_taks[3])
+        if len(current_taks) == 5:
+            task_repeat = int(current_taks[4])
+        else:
+            task_repeat = 1
         print("Task on", task_structure, "in data range from", task_start_range,
-              "to", task_stop_range, "with step", task_range_step)
+              "to", task_stop_range, "with step", task_range_step, "made", task_repeat, "time")
         if task_stop_range > len(data_array):
             print("Not enought loaded data to execute task")
         else:
             if task_structure == 'array':
                 try:
                     for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        array_operations(current_size_of_structure)
+                        for repeat in range(task_repeat):
+                            array_operations(current_size_of_structure)
                     print("Done")
                 except:
                     print("Error")
             elif task_structure == 'list':
                 try:
                     for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        list_operations(current_size_of_structure)
+                        for repeat in range(task_repeat):
+                            list_operations(current_size_of_structure)
                     print("Done")
                 except:
                     print("Error")
             elif task_structure == 'stack':
                 try:
                     for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        stack_operations(current_size_of_structure)
+                        for repeat in range(task_repeat):
+                            stack_operations(current_size_of_structure)
                     print("Done")
                 except:
                     print("Error")
             elif task_structure == 'queue':
                 try:
                     for current_size_of_structure in range(task_start_range, task_stop_range, task_range_step):
-                        queue_operations(current_size_of_structure)
+                        for repeat in range(task_repeat):
+                            queue_operations(current_size_of_structure)
                     print("Done")
                 except:
                     print("Error")
