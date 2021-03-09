@@ -164,15 +164,39 @@ def stack_operations(size_of_stack):
     stack.pop()
     t_stop = perf_counter_ns()
     t_pop = t_stop-t_start
-    # PEEK OPERATION
+    # SEARCH OPERATION
+    random_index = random.randint(0, size_of_stack-1)
+    searched_value = data_array[random_index]
     t_start = perf_counter_ns()
-    stack.peek()
+    temp_stack = Stack()
+    temp_stack_len = 0
+    # PUT OPERATION (index of put is depth of stack when data should be putted)
+    random_index = random.randint(0, size_of_stack-1)
+    random_value = random.randint(-1000000, 1000000)
+    t_start = perf_counter_ns()
+    temp_stack = Stack()
+    for i in range(random_index):
+        temp_stack.push(stack.pop())
+    stack.push(random_value)
+    for i in range(random_index):
+        stack.push(temp_stack.pop())
     t_stop = perf_counter_ns()
-    t_peek = t_stop-t_start
+    t_put = t_stop-t_start
+    for i in range(size_of_stack):
+        if stack.peek() == searched_value:
+            break
+        else:
+            temp_stack.push(stack.pop())
+            temp_stack_len += 1
+    for i in range(temp_stack_len):
+        stack.push(temp_stack.pop())
+    t_stop = perf_counter_ns()
+    t_search = t_stop-t_start
     result_array.append(Result("stack", "create", size_of_stack, t_create))
+    result_array.append(Result("stack", "put", size_of_stack, t_put))
     result_array.append(Result("stack", "push", size_of_stack, t_push))
     result_array.append(Result("stack", "pop", size_of_stack, t_pop))
-    result_array.append(Result("stack", "peek", size_of_stack, t_peek))
+    result_array.append(Result("stack", "search", size_of_stack, t_search))
 
 
 def list_operations(size_of_list):
