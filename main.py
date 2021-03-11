@@ -152,6 +152,7 @@ class Queue:
     def dequeue(self):
         if not self.isEmpty():
             dequeued_element = self.queue[self.front]
+            self.queue[self.front] = 0
             self.front = int((self.front + 1) % self.max_size)
             self.size -= 1
             return dequeued_element
@@ -312,12 +313,6 @@ def array_operations(size_of_array):
         array[i] = data_array[i]
     t_stop = perf_counter_ns()
     t_create = t_stop-t_start
-    # PUT OPERATION
-    random_index = random.randint(0, size_of_array-1)
-    t_start = perf_counter_ns()
-    array[random_index] = 0
-    t_stop = perf_counter_ns()
-    t_put = t_stop-t_start
     # SEARCH OPERATION
     random_index = random.randint(0, size_of_array-1)
     searched_value = array[random_index]
@@ -327,6 +322,14 @@ def array_operations(size_of_array):
             t_stop = perf_counter_ns()
             break
     t_search = t_stop-t_start
+    # PUT OPERATION
+    random_index = random.randint(0, size_of_array-1)
+    temp = array[random_index]
+    t_start = perf_counter_ns()
+    array[random_index] = 0
+    t_stop = perf_counter_ns()
+    t_put = t_stop-t_start
+    array[random_index] = temp
     # ADD OPERATION
     random_value = random.randint(-1000000, 1000000)
     t_start = perf_counter_ns()
@@ -337,13 +340,14 @@ def array_operations(size_of_array):
     array = new_array
     t_stop = perf_counter_ns()
     t_add = t_stop-t_start
+    array.pop(size_of_array)
     # DELETE OPERATION
     random_index = random.randint(0, size_of_array-1)
     t_start = perf_counter_ns()
     new_array = [0]*(size_of_array-1)
     for i in range(0, random_index):
         new_array[i] = array[i]
-    for i in range(random_index+1, size_of_array-1):
+    for i in range(random_index, size_of_array-1):
         new_array[i] = array[i+1]
     array = new_array
     t_stop = perf_counter_ns()
